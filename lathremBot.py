@@ -1,5 +1,21 @@
-from random import choice
+# lathremBot.py
+#
+# This is the main module for lathremBot. It contains all the methods used to
+# accept and reply to messages from discord.
+#
+# The discord.py module is used to handle communications to and from the
+# Discord API. More information about discord.py and the Discord API can be
+# found here:
+#     https://github.com/Rapptz/discord.py
+#     https://github.com/discordapp/discord-api-docs
+#
+# Please note that this bot uses lower level features of discord.py and it
+# might be better/easier to explore the higher level discord.ext options as
+# they provide more functionality "out-of-the-box".
+
+
 from os import path
+from random import choice
 from time import gmtime, strftime
 
 
@@ -22,12 +38,8 @@ def registerCommand():
     """
     This decorator registers methods for the bot.  Put this before each
     method that should be exposed as a bot command.
-
-    Keyword arguments:
-    commandDesc -- This should contain the end user documentation used
-                   to describe the function of the bot command. It will
-                   be displayed by the help command.
     """
+
     def registerCommand(func):
         commands[func.__name__] = func
         return func
@@ -37,8 +49,9 @@ def registerCommand():
 @client.event
 async def on_ready():
     """
-    This is called when the client finished connecting.
+    This is called when the client has finished connecting.
     """
+
     print(f"""{client.user} connected and listening on: """)
     [print(f"""  {guild.name}""") for guild in client.guilds]
     print(f"""Registered Commands:""")
@@ -50,6 +63,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    """
+    This is called for every message that LathremBot can see.
+    """
 
     # don't respond to messages from this bot
     if message.author == client.user:
@@ -77,47 +93,10 @@ async def on_message(message):
             # lower case only please
             cmd[0] = cmd[0].casefold()
 
-            # shut down the bot
-            if cmd[0] == """shutdown""":
-                if message.author.id == int(getConfig('admin')):
-                    await client.logout()
-                    return
-
             # execute the command
             if cmd[0] in commands:
                 await commands[cmd[0]](message, cmd[1:], prefix)
                 return
-
-
-@registerCommand()
-async def help(message, args, prefix):
-    """
-    Displays help messages.
-
-    Call with no arguments to get a list of available
-    commands, or call with a command as an argument to
-    get additional information about that command.
-
-    Each help command should contain a "Usage" section:
-        Optional arguments are enclosed in [square brackets]
-        Required arguments are enclosed in <angle brackets>
-
-    Usage:
-        {prefix}help [command]
-    """
-    if len(args) == 1:
-        if args[0] in commands:
-            desc = commands[args[0]].__doc__.format(prefix=prefix)
-            reply = f"""{args[0]}\n{desc}"""
-            await message.author.send(f"""```\n{reply}```""")
-    else:
-        reply = f"""LathremBot v{version}\n\nCommands:\n"""
-        padding = max(map(len, commands))
-        for (key, func) in commands.items():
-            desc = func.__doc__.split("""\n""", 2)[1].strip()
-            reply += f"""  {key.ljust(padding)}  {desc}\n"""
-        reply += f"""\nType {prefix}help <command> for more info."""
-        await message.author.send(f"""```\n{reply}```""")
 
 
 helloReplies = ["Ahoy ", "Aloha ", "Bonjour ", "Ciao ", "Hello ",
@@ -134,8 +113,9 @@ async def hello(message, args, prefix):
     Usage:
         {prefix}hello
     """
-    name = message.author.display_name
-    reply = f"""{choice(helloReplies)}{name}!"""
+
+    id = message.author.id
+    reply = f"""{choice(helloReplies)}<@{id}>!"""
     await message.channel.send(reply)
 
 
@@ -161,9 +141,42 @@ async def m8b(message, args, prefix):
     Usage:
         {prefix}m8b [your yes/no question]
     """
-    name = message.author.display_name
-    reply = f"""{name}, the magic 8-ball says:\n> {choice(m8bReplies)}"""
+
+    id = message.author.id
+    reply = f"""<@{id}>, the magic 8-ball says:\n> {choice(m8bReplies)}"""
     await message.channel.send(reply)
+
+
+@registerCommand()
+async def help(message, args, prefix):
+    """
+    Displays help messages.
+
+    Call with no arguments to get a list of available
+    commands, or call with a command as an argument to
+    get additional information about that command.
+
+    Each help command should contain a "Usage" section:
+        Optional arguments are enclosed in [square brackets]
+        Required arguments are enclosed in <angle brackets>
+
+    Usage:
+        {prefix}help [command]
+    """
+
+    if len(args) == 1:
+        if args[0] in commands:
+            desc = commands[args[0]].__doc__.format(prefix=prefix)
+            reply = f"""{args[0]}\n{desc}"""
+            await message.author.send(f"""```\n{reply}```""")
+    else:
+        reply = f"""LathremBot v{version}\n\nCommands:\n"""
+        padding = max(map(len, commands))
+        for (key, func) in commands.items():
+            desc = func.__doc__.split("""\n""", 2)[1].strip()
+            reply += f"""  {key.ljust(padding)}  {desc}\n"""
+        reply += f"""\nType {prefix}help <command> for more info."""
+        await message.author.send(f"""```\n{reply}```""")
 
 
 @registerCommand()
@@ -176,12 +189,13 @@ async def prefix(message, args, prefix):
     at least 2 characters long and shouldn't start with
     any of Discord's markdown or escape characters.
 
-    This command is only supported in server channel,
+    This command is only supported in server channels,
     it is ignored in direct messages.
 
     Usage:
         {prefix}prefix <new prefix>
     """
+
     if message.guild is not None:
         if message.author.id == message.guild.owner_id:
             if len(args) == 1:
@@ -192,45 +206,19 @@ async def prefix(message, args, prefix):
 
 
 @registerCommand()
-async def roll(message, args, prefix):
+async def shutdown(message, args, prefix):
     """
-    Roll the dice.
+    Shut down LathremBot.
 
-    You can choose to roll up to 20 dice at one time and 
-    the number of sides range from 2 to 100! Specify the
-    dice to use as NdS where N is the number of dice and
-    S is the number of sides. If dice are not specified,
-    1d20 will be used.
+    The owner of LathremBot can use this command to
+    perform a clean shutdown.
 
     Usage:
-        {prefix}roll <number>d<sides>
+        {prefix}shutdown
     """
-    if len(args) == 0:
-        await message.channel.send(
-            f"""{message.author.display_name} """
-            f"""rolls one D20....\n> `` {choice(list(range(1, 21)))} ``"""
-        )
-    else:
-        if "d" in args[0]:
-            ns = args[0].split("d")
-            if len(ns) == 2:
-                if ns[0].isdigit() and ns[1].isdigit():
-                    if 20 >= int(ns[0]) >= 1 and 100 >= int(ns[1]) >= 2:
-                        n = int(ns[0])
-                        s = int(ns[1])
-                        d = " dice" if n > 1 else ""
-                        reply = (f"""{message.author.display_name} grabs """
-                                 f"""{n} D{s}{d} """
-                                 f"""and rolls...\n> """)
-                        total = 0
-                        for i in range(n):
-                            r = choice(list(range(1, s + 1)))
-                            total += r
-                            reply += f"""`` {r} `` """
-                        if n > 1:
-                            reply += (f"""\n>  -- that's a total """
-                                      f"""of {total} --""")
-                        await message.channel.send(reply)
+
+    if message.author.id == int(getConfig('admin')):
+        await client.logout()
 
 
 # start the client

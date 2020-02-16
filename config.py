@@ -1,4 +1,4 @@
-# database.py
+# config.py
 #
 # This module contains the functions that manage all the configuration
 # settings and server/member data used by lathremBot.

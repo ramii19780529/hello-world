@@ -28,7 +28,7 @@ dbConfig = {"pool_name": "botpool",
 def create(sql, data={}):
     """
     This function is used to create a new record in the database. It returns
-    a tuple containint the number of rows affected and the value generated for
+    a tuple containing the number of rows affected and the value generated for
     an AUTO_INCREMENT column or None when there is no such value available.
 
     Keyword arguments:
