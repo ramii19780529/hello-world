@@ -32,9 +32,11 @@ def setConfig(configKey, configValue):
     configKey -- This is the name of the configuration setting.
     configValue -- This is the value of the configuration setting.
     """
-    sql = ("""insert into config(configKey, configValue) """
-           """values(%(configKey)s, %(configValue)s) """
-           """on duplicate key update configValue = %(configValue)s""")
+    sql = (
+        """insert into config(configKey, configValue) """
+        """values(%(configKey)s, %(configValue)s) """
+        """on duplicate key update configValue = %(configValue)s"""
+    )
     data = {"configKey": configKey, "configValue": configValue}
     update(sql, data)
 
@@ -50,8 +52,10 @@ def getServerConfig(serverId, configKey):
     serverId -- The server id related to the configuration setting.
     configKey -- The name of the configuration setting.
     """
-    sql = ("""select configValue from serverConfig """
-           """where serverId = %(serverId)s and configKey = %(configKey)s""")
+    sql = (
+        """select configValue from serverConfig """
+        """where serverId = %(serverId)s and configKey = %(configKey)s"""
+    )
     data = {"serverId": serverId, "configKey": configKey}
     for (value,) in read(sql, data):
         return value
@@ -69,12 +73,12 @@ def setServerConfig(serverId, configKey, configValue):
     configKey -- The name of the configuration setting.
     configValue -- The value of the configuration setting.
     """
-    sql = ("""insert into serverConfig(serverId, configKey, configValue) """
-           """values(%(serverId)s, %(configKey)s, %(configValue)s) """
-           """on duplicate key update configValue = %(configValue)s""")
-    data = {"serverId": serverId,
-            "configKey": configKey,
-            "configValue": configValue}
+    sql = (
+        """insert into serverConfig(serverId, configKey, configValue) """
+        """values(%(serverId)s, %(configKey)s, %(configValue)s) """
+        """on duplicate key update configValue = %(configValue)s"""
+    )
+    data = {"serverId": serverId, "configKey": configKey, "configValue": configValue}
     update(sql, data)
 
 
@@ -89,8 +93,10 @@ def getMemberConfig(memberId, configKey):
     memberId -- The member id related to the configuration setting.
     configKey -- The name of the configuration setting.
     """
-    sql = ("""select configValue from memberConfig """
-           """where memberId = %(memberId)s and configKey = %(configKey)s""")
+    sql = (
+        """select configValue from memberConfig """
+        """where memberId = %(memberId)s and configKey = %(configKey)s"""
+    )
     data = {"memberId": memberId, "configKey": configKey}
     for (value,) in read(sql, data):
         return value
@@ -108,10 +114,10 @@ def setMemberConfig(memberId, configKey, configValue):
     configKey -- The name of the configuration setting.
     configValue -- The value of the configuration setting.
     """
-    sql = ("""insert into memberConfig(memberId, configKey, configValue) """
-           """values(%(memberId)s, %(configKey)s, %(configValue)s) """
-           """on duplicate key update configValue = %(configValue)s""")
-    data = {"memberId": memberId,
-            "configKey": configKey,
-            "configValue": configValue}
+    sql = (
+        """insert into memberConfig(memberId, configKey, configValue) """
+        """values(%(memberId)s, %(configKey)s, %(configValue)s) """
+        """on duplicate key update configValue = %(configValue)s"""
+    )
+    data = {"memberId": memberId, "configKey": configKey, "configValue": configValue}
     update(sql, data)

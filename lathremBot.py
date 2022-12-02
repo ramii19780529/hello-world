@@ -43,6 +43,7 @@ def registerCommand():
     def registerCommand(func):
         commands[func.__name__] = func
         return func
+
     return registerCommand
 
 
@@ -54,7 +55,7 @@ async def on_ready():
 
     print(f"""{client.user} connected and listening on: """)
     [print(f"""  {guild.name}""") for guild in client.guilds]
-    print(f"""Registered Commands:""")
+    print("""Registered Commands:""")
     [print(f"""  [{key}]""") for key in commands]
     for user in client.users:
         if not user.bot:
@@ -76,8 +77,8 @@ async def on_message(message):
         return
 
     # get the command prefix for the source guild
-    guild_id = getattr(message.guild, 'id', None)
-    prefix = getServerConfig(guild_id , "prefix")
+    guild_id = getattr(message.guild, "id", None)
+    prefix = getServerConfig(guild_id, "prefix")
 
     # process commands
     cmd = message.content
@@ -85,7 +86,7 @@ async def on_message(message):
 
         # get the requested command and its arguments by removing
         # the bot_prefix and splitting the words into a list
-        cmd = cmd[len(prefix):].split()
+        cmd = cmd[len(prefix) :].split()
 
         # make sure a command was given
         if len(cmd) > 0:
@@ -99,8 +100,17 @@ async def on_message(message):
                 return
 
 
-helloReplies = ["Ahoy ", "Aloha ", "Bonjour ", "Ciao ", "Hello ",
-                "Hiya ", "Hola ", "Howdy ", "Konnichiwa "]
+helloReplies = [
+    "Ahoy ",
+    "Aloha ",
+    "Bonjour ",
+    "Ciao ",
+    "Hello ",
+    "Hiya ",
+    "Hola ",
+    "Howdy ",
+    "Konnichiwa ",
+]
 
 
 @registerCommand()
@@ -119,16 +129,28 @@ async def hello(message, args, prefix):
     await message.channel.send(reply)
 
 
-m8bReplies = ["It is certain.", "It is decidedly so.",
-              "Without a doubt.", "Yes - definitely.",
-              "You may rely on it.", "As I see it, yes.",
-              "Most likely.", "Outlook good.",
-              "Yes.", "Signs point to yes.",
-              "Reply hazy, try again.", "Ask again later.",
-              "Better not tell you now.", "Cannot predict now.",
-              "Concentrate and ask again.", "Don't count on it.",
-              "My reply is no.", "My sources say no.",
-              "Outlook not so good.", "Very doubtful."]
+m8bReplies = [
+    "It is certain.",
+    "It is decidedly so.",
+    "Without a doubt.",
+    "Yes - definitely.",
+    "You may rely on it.",
+    "As I see it, yes.",
+    "Most likely.",
+    "Outlook good.",
+    "Yes.",
+    "Signs point to yes.",
+    "Reply hazy, try again.",
+    "Ask again later.",
+    "Better not tell you now.",
+    "Cannot predict now.",
+    "Concentrate and ask again.",
+    "Don't count on it.",
+    "My reply is no.",
+    "My sources say no.",
+    "Outlook not so good.",
+    "Very doubtful.",
+]
 
 
 @registerCommand()
@@ -217,7 +239,7 @@ async def shutdown(message, args, prefix):
         {prefix}shutdown
     """
 
-    if message.author.id == int(getConfig('admin')):
+    if message.author.id == int(getConfig("admin")):
         await client.logout()
 
 
